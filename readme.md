@@ -69,11 +69,11 @@ public void Delete(int index)
 ## Sơ đồ hoạt động
 ```mermaid
 flowchart LR
-	UI[WinForms UI\n(MainForm, ProfileEditorForm)] --> Repo[ProfileRepository]
-	Repo --> TableMgr[TableManager\n(base/Table)]
-	TableMgr --> FileIO[FileIOManager\n(base/FileIO)]
-	FileIO --> DataDir[(profile_data/*.bin)]
-	Repo <-->|BindingSource| UI
+    UI["WinForms UI<br/>(MainForm, ProfileEditorForm)"] --> Repo["ProfileRepository"]
+    Repo --> TableMgr["TableManager<br/>(base/Table)"]
+    TableMgr --> FileIO["FileIOManager<br/>(base/FileIO)"]
+    FileIO --> DataDir[("profile_data/*.bin")]
+    UI <--> Repo["ProfileRepository<br/>(via BindingSource)"]
 ```
 
 ## Chi tiết cấu trúc dữ liệu chỉ mục (B-Tree đơn giản)
