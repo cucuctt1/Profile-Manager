@@ -10,7 +10,7 @@ namespace BasicDataBase.Index
     {
         private readonly string metadataPath;
         private readonly string dataPath;
-        private readonly Dictionary<string, BPlusTree> indexes = new Dictionary<string, BPlusTree>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, BinarySearchTree> indexes = new Dictionary<string, BinarySearchTree>(StringComparer.OrdinalIgnoreCase);
 
         public IndexManager(string metadataPath, string dataPath)
         {
@@ -32,7 +32,7 @@ namespace BasicDataBase.Index
             if (fieldPos < 0) throw new ArgumentException($"Field '{fieldName}' not found in schema");
 
             var all = FileIOManager.ReadAll(metadataPath, dataPath);
-            var tree = new BPlusTree();
+            var tree = new BinarySearchTree();
             for (int r = 0; r < all.GetLength(0); r++)
             {
                 var key = all[r, fieldPos]?.ToString() ?? string.Empty;
