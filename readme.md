@@ -68,12 +68,46 @@ public void Delete(int index)
 
 ## Sơ đồ hoạt động
 ```mermaid
-flowchart LR
-    UI["WinForms UI<br/>(MainForm, ProfileEditorForm)"] --> Repo["ProfileRepository"]
-    Repo --> TableMgr["TableManager<br/>(base/Table)"]
-    TableMgr --> FileIO["FileIOManager<br/>(base/FileIO)"]
-    FileIO --> DataDir[("profile_data/*.bin")]
-    UI <--> Repo["ProfileRepository<br/>(via BindingSource)"]
+flowchart TD
+	subgraph UI_Layer [UI Layer]
+		Toolbar[Toolbar & Search Box]
+		Grid[DataGridView Binding]
+		Editor[ProfileEditorForm Dialog]
+	end
+
+	subgraph App_Layer [Application Layer]
+		Controller[MainForm Controller Logic]
+		Repository[ProfileRepository]
+	end
+
+	subgraph Data_Layer [Data Access Layer]
+		TableMgr[TableManager]
+		TableDef[TableDefinition]
+		IndexMgr[IndexManager + BinarySearchTree]
+	end
+
+	subgraph Storage_Layer [Storage Layer]
+		FileIO[FileIOManager]
+		Schema[SchemaConstruct & SchemaInstruction]
+		Meta[(profile_data/__catalog/metadata.meta)]
+		DataFiles[(profile_data/Profiles/blobs & data.bin)]
+	end
+
+	Toolbar --> Controller
+	Grid --> Controller
+	Editor --> Controller
+	Controller --> Repository
+	Repository -->|Normalize field names\nShape records| TableMgr
+	TableMgr -->|Resolve schema| TableDef
+	TableMgr -->|CRUD & Query ops| IndexMgr
+	TableMgr -->|Binary buffer IO| FileIO
+	IndexMgr -->|Ensure index\n(SearchExact, SearchPrefix)| TableMgr
+	FileIO --> Schema
+	Schema --> Meta
+	FileIO --> DataFiles
+	Repository -->|Project rows\nMap to ProfileRow| Controller
+	Controller -->|BindingSource refresh| Grid
+	Controller -->|Open dialog| Editor
 ```
 
 ## Chi tiết cấu trúc dữ liệu chỉ mục (B-Tree đơn giản)
