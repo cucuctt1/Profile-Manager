@@ -1,14 +1,28 @@
+// naming fix by chatgpt
+// todo
+
+// tao và quản lý table hồ sơ
+
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using BasicDataBase.Table;
 
+
 namespace ProfileManager.Profiles
 {
     public sealed class ProfileRepository
     {
+        // profiles viet hoa di
         private const string DefaultTableName = "Profiles";
+        // "id:int,hovaten:string:256,namsinh:datetime,
+        // noisinh:string:256,quequan:string:256,lop:string:64
+        // ,tongiao:string:64,gioitinh:string:32,nienkhoa:string:64
+        // ,masobhyt:string:64,masobhxh:string:64,diachi:string:256,
+        // sdt:string:32,vaodoan:bool,vaodang:bool"
+
+
         private const string SchemaString = "id:int,hovaten:string:256,namsinh:datetime,noisinh:string:256,quequan:string:256,lop:string:64,tongiao:string:64,gioitinh:string:32,nienkhoa:string:64,masobhyt:string:64,masobhxh:string:64,diachi:string:256,sdt:string:32,vaodoan:bool,vaodang:bool";
         private readonly TableManager tableManager;
         private readonly HashSet<string> indexedFields = new(StringComparer.OrdinalIgnoreCase);
@@ -21,6 +35,7 @@ namespace ProfileManager.Profiles
             EnsureTable();
         }
 
+        // lay tat ca
         public IReadOnlyList<ProfileRow> GetAll()
         {
             var rows = tableManager.GetAllRecords(tableName);
@@ -33,6 +48,7 @@ namespace ProfileManager.Profiles
             return list;
         }
 
+        // lay theo index
         public ProfileRow? GetByIndex(int index)
         {
             var record = tableManager.GetRecord(tableName, index);
@@ -40,9 +56,11 @@ namespace ProfileManager.Profiles
             return new ProfileRow(index, ToRecord(record));
         }
 
+        // search ten field, 
         public IReadOnlyList<ProfileRow> Search(string fieldName, string value, bool exact)
         {
-            var query = value.Trim();
+            // chatgpt fix
+            var query = value.Trim(); // trim khoang trang
             if (string.IsNullOrWhiteSpace(query)) return GetAll();
             var field = NormalizeField(fieldName);
             if (!exact)
@@ -82,6 +100,8 @@ namespace ProfileManager.Profiles
             return list;
         }
 
+
+        // tìm kiếm low accuracy
         private IReadOnlyList<ProfileRow> SearchPartial(string field, string value)
         {
             var rows = GetAll();
@@ -94,8 +114,10 @@ namespace ProfileManager.Profiles
             return list;
         }
 
+        // get field text 
         private static string GetFieldText(ProfileRecord record, string field)
         {
+            // chatgpt fix
             return field switch
             {
                 "id" => record.Id.ToString(CultureInfo.InvariantCulture),
@@ -139,24 +161,21 @@ namespace ProfileManager.Profiles
             }
             return list;
         }
-
         public void Add(ProfileRecord record)
         {
+
             var values = ToValues(record);
             tableManager.InsertRecord(tableName, values);
         }
-
         public void Update(int index, ProfileRecord record)
         {
             var values = ToValues(record);
             tableManager.UpdateRecord(tableName, index, values);
         }
-
         public void Delete(int index)
         {
             tableManager.DeleteRecord(tableName, index);
         }
-
         public int GetNextId()
         {
             var all = GetAll();
@@ -167,7 +186,6 @@ namespace ProfileManager.Profiles
             }
             return max + 1;
         }
-
         public void WipeAll()
         {
             tableManager.DropTable(tableName);
@@ -175,7 +193,6 @@ namespace ProfileManager.Profiles
             tableManager.CreateTable(tableName, schema);
             indexedFields.Clear();
         }
-
         private void EnsureTable()
         {
             try
@@ -185,9 +202,13 @@ namespace ProfileManager.Profiles
             }
             catch (InvalidOperationException)
             {
+                // catch cai j day bro
+
+                // table da ton tai // 👌
             }
             catch (IOException)
             {
+                // file io error
             }
             try
             {
@@ -196,12 +217,14 @@ namespace ProfileManager.Profiles
                 {
                     var schema = BasicDataBase.FileIO.Schema.FromString(SchemaString);
                     tableManager.DropTable(tableName);
+
                     tableManager.CreateTable(tableName, schema);
                     indexedFields.Clear();
                 }
             }
             catch
             {
+                // ignore
             }
         }
 
@@ -260,6 +283,7 @@ namespace ProfileManager.Profiles
         {
             return field switch
             {
+                // fix naming thành khong hoa 
                 "Id" or "id" => "id",
                 "HoVaTen" or "hovaten" => "hovaten",
                 "NamSinh" or "namsinh" => "namsinh",
@@ -280,5 +304,5 @@ namespace ProfileManager.Profiles
         }
     }
 
-    public readonly record struct ProfileRow(int Index, ProfileRecord Record);
+    public readonly record struct ProfileRow(int Index, ProfileRecord Record); // readonly
 }

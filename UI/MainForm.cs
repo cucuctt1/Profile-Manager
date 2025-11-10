@@ -101,8 +101,10 @@ namespace ProfileManager.UI
             var refreshButton = new Button { Text = "Refresh", AutoSize = true, Margin = new Padding(0, 0, 12, 8) };
             refreshButton.Click += (_, _) => ReloadAll();
 
-            var overlayToggle = new Button { Text = "Templates", AutoSize = true, Margin = new Padding(0, 0, 0, 8) };
-            overlayToggle.Click += (_, _) => ToggleOverlay();
+
+            //unused
+            // var overlayToggle = new Button { Text = "Templates", AutoSize = true, Margin = new Padding(0, 0, 0, 8) };
+            // overlayToggle.Click += (_, _) => ToggleOverlay();
 
             var debugGroup = new GroupBox
             {
@@ -126,6 +128,7 @@ namespace ProfileManager.UI
             seedButton.Click += (_, _) => SeedData();
             var wipeButton = new Button { Text = "Wipe", AutoSize = true };
             wipeButton.Click += (_, _) => WipeAll();
+            // them compo va debug compo 
             debugLayout.Controls.Add(seedButton);
             debugLayout.Controls.Add(wipeButton);
             debugGroup.Controls.Add(debugLayout);
@@ -143,7 +146,7 @@ namespace ProfileManager.UI
             topPanel.Controls.Add(deleteButton);
             topPanel.Controls.Add(refreshButton);
             topPanel.Controls.Add(debugGroup);
-            topPanel.Controls.Add(overlayToggle);
+            //topPanel.Controls.Add(overlayToggle);
 
             grid = new DataGridView
             {
@@ -159,7 +162,8 @@ namespace ProfileManager.UI
                 ScrollBars = ScrollBars.Both
             };
             grid.CellDoubleClick += (_, _) => EditRecord();
-
+            //////////////////////////////////////////////////// setup columns ////////////////////////////////////////////////////
+            // spam de
             var indexColumn = new DataGridViewTextBoxColumn
             {
                 DataPropertyName = nameof(ProfileViewRow.Index),
@@ -256,7 +260,7 @@ namespace ProfileManager.UI
                 DataPropertyName = nameof(ProfileViewRow.VaoDang),
                 Width = 90
             };
-
+            ///////////////////////////////////////////////////////////////////////////////////////////////////
             grid.Columns.AddRange(indexColumn, idColumn, nameColumn, emailColumn, roleColumn, createdColumn, lopColumn, tonGiaoColumn, gioiTinhColumn, nienKhoaColumn, bhytColumn, bhxhColumn, diaChiColumn, sdtColumn, vaoDoanColumn, vaoDangColumn);
             bindingSource.DataSource = viewRows;
             grid.DataSource = bindingSource;
@@ -462,6 +466,8 @@ namespace ProfileManager.UI
             bindingSource.ResetBindings(false);
         }
 
+
+        //unused
         private void ToggleOverlay()
         {
             if (overlayPanel.Visible)

@@ -8,31 +8,31 @@ namespace BasicDataBase.Index
     {
         private Node? root;
 
-        public void Insert(string key, int recordId)
+        public void Insert(string key, int recordId) // add a record id to the key
         {
             key ??= string.Empty;
             root = Insert(root, key, recordId);
         }
 
-        public bool Delete(string key, int recordId)
+        public bool Delete(string key, int recordId) // remove record
         {
             key ??= string.Empty;
             root = Delete(root, key, recordId, out bool removed);
             return removed;
         }
 
-        public List<int> Search(string key)
+        public List<int> Search(string key) // get list of record ids for the key
         {
             key ??= string.Empty;
             var node = FindNode(root, key);
             return node == null ? new List<int>() : new List<int>(node.Values);
         }
 
-        public List<int> SearchPrefix(string prefix)
+        public List<int> SearchPrefix(string prefix) // get list of record ids for keys with the prefix
         {
             prefix ??= string.Empty;
             var result = new List<int>();
-            foreach (var kvp in Traverse())
+            foreach (var kvp in traverse())
             {
                 if (kvp.Key.StartsWith(prefix, StringComparison.Ordinal))
                 {
@@ -46,10 +46,10 @@ namespace BasicDataBase.Index
             return result;
         }
 
-        public List<int> SearchRange(string? minKey, string? maxKey)
+        public List<int> SearchRange(string? minKey, string? maxKey) // get list of record ids for keys in the range [minKey, maxKey]
         {
             var result = new List<int>();
-            foreach (var kvp in Traverse(minKey, maxKey))
+            foreach (var kvp in traverse(minKey, maxKey))
             {
                 result.AddRange(kvp.Value);
             }
@@ -61,15 +61,15 @@ namespace BasicDataBase.Index
             root = null;
         }
 
-        public IEnumerable<KeyValuePair<string, IReadOnlyList<int>>> Traverse(string? minKey = null, string? maxKey = null, bool minInclusive = true, bool maxInclusive = true)
+        public IEnumerable<KeyValuePair<string, IReadOnlyList<int>>> traverse(string? minKey = null, string? maxKey = null, bool minInclusive = true, bool maxInclusive = true)
         {
-            foreach (var node in TraverseNodes(root, minKey, maxKey, minInclusive, maxInclusive))
+            foreach (var node in traversenodes(root, minKey, maxKey, minInclusive, maxInclusive))
             {
                 yield return new KeyValuePair<string, IReadOnlyList<int>>(node.Key, node.Values);
             }
         }
 
-        private Node? Insert(Node? node, string key, int recordId)
+        private Node? Insert(Node? node, string key, int recordId) // insert record node
         {
             if (node == null) return new Node(key, recordId);
 
@@ -89,7 +89,7 @@ namespace BasicDataBase.Index
             return node;
         }
 
-        private Node? Delete(Node? node, string key, int recordId, out bool removed)
+        private Node? Delete(Node? node, string key, int recordId, out bool removed) // remove record node
         {
             if (node == null)
             {
@@ -129,22 +129,22 @@ namespace BasicDataBase.Index
             if (node.Left == null) return node.Right;
             if (node.Right == null) return node.Left;
 
-            Node successor = FindMin(node.Right);
+            Node successor = findmin(node.Right);
             node.Key = successor.Key;
             node.Values = new List<int>(successor.Values);
-            node.Right = RemoveMin(node.Right);
+            node.Right = removeMin(node.Right);
             return node;
         }
 
-        private Node? RemoveMin(Node? node)
+        private Node? removeMin(Node? node) // remove the minimum node private method
         {
             if (node == null) return null;
             if (node.Left == null) return node.Right;
-            node.Left = RemoveMin(node.Left);
+            node.Left = removeMin(node.Left);
             return node;
         }
 
-        private Node FindMin(Node node)
+        private Node findmin(Node node)
         {
             while (node.Left != null) node = node.Left;
             return node;
@@ -161,7 +161,7 @@ namespace BasicDataBase.Index
             return null;
         }
 
-        private IEnumerable<Node> TraverseNodes(Node? node, string? minKey, string? maxKey, bool minInclusive, bool maxInclusive)
+        private IEnumerable<Node> traversenodes(Node? node, string? minKey, string? maxKey, bool minInclusive, bool maxInclusive)
         {
             if (node == null) yield break;
 
@@ -170,7 +170,7 @@ namespace BasicDataBase.Index
 
             if (minKey == null || cmpMin > 0)
             {
-                foreach (var left in TraverseNodes(node.Left, minKey, maxKey, minInclusive, maxInclusive))
+                foreach (var left in traversenodes(node.Left, minKey, maxKey, minInclusive, maxInclusive))
                     yield return left;
             }
 
@@ -183,7 +183,7 @@ namespace BasicDataBase.Index
 
             if (maxKey == null || cmpMax < 0)
             {
-                foreach (var right in TraverseNodes(node.Right, minKey, maxKey, minInclusive, maxInclusive))
+                foreach (var right in traversenodes(node.Right, minKey, maxKey, minInclusive, maxInclusive))
                     yield return right;
             }
         }
@@ -195,7 +195,6 @@ namespace BasicDataBase.Index
                 Key = key;
                 Values = new List<int> { recordId };
             }
-
             public string Key { get; set; }
             public List<int> Values { get; set; }
             public Node? Left { get; set; }

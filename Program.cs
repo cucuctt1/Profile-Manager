@@ -10,6 +10,7 @@ namespace ProfileManager
 		{
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
+			// run the UI
 			Application.Run(new UI.MainForm());
 		}
 	}

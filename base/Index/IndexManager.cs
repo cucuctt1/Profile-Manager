@@ -109,7 +109,7 @@ namespace BasicDataBase.Index
             if (!descending)
             {
                 var result = new List<int>(k);
-                foreach (var kvp in tree.Traverse())
+                foreach (var kvp in tree.traverse())
                 {
                     foreach (var id in kvp.Value)
                     {
@@ -122,7 +122,7 @@ namespace BasicDataBase.Index
             else
             {
                 var all = new List<int>();
-                foreach (var kvp in tree.Traverse())
+                foreach (var kvp in tree.traverse())
                 {
                     all.AddRange(kvp.Value);
                 }
