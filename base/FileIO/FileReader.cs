@@ -96,7 +96,7 @@ namespace BasicDataBase.FileIO
             object[,] result = new object[rowCount, colCount];
             for (int i = 0; i < rowCount; i++)
                 for (int j = 0; j < colCount; j++)
-                    // rows[i][j] may be null; assign with null-forgiving to satisfy nullable analysis
+                    // handle mising colum
                     result[i, j] = j < rows[i].Length ? rows[i][j] : null!;
 
             return result;

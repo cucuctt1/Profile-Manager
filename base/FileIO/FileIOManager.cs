@@ -29,7 +29,7 @@ namespace BasicDataBase.FileIO
             }
         }
 
-        // Append a single record (array of field objects) to data file
+        // append a single record (array of field objects) to data file
         public static void AppendRecord(string metadataPath, string dataPath, object?[] record)
         {
             var (schema, fieldCount) = LoadSchemaAndFieldCount(metadataPath);
@@ -48,8 +48,8 @@ namespace BasicDataBase.FileIO
             }
         }
 
-        // Read the byte offsets (start inclusive, end exclusive) of a record by index
-        // Returns true if found; out start/end are file offsets
+        // read the byte offsets (start inclusive, end exclusive) of a record by index
+        // returns true if found; out start/end are file offsets
         public static bool TryGetRecordOffsets(string dataPath, int fieldCount, long recordIndex, out long startOffset, out long endOffset)
         {
             startOffset = 0; endOffset = 0;
@@ -83,7 +83,7 @@ namespace BasicDataBase.FileIO
             return false;
         }
 
-        // Read a record by index
+        // read a record by index
         public static object?[]? ReadRecord(string metadataPath, string dataPath, long recordIndex)
         {
             var (schema, fieldCount) = LoadSchemaAndFieldCount(metadataPath);
@@ -112,7 +112,7 @@ namespace BasicDataBase.FileIO
             }
         }
 
-        // Read all records into a 2D array (rows x cols)
+        // read all records into a 2d array (rows x cols)
         public static object?[,] ReadAll(string metadataPath, string dataPath)
         {
             var (schema, fieldCount) = LoadSchemaAndFieldCount(metadataPath);
@@ -151,13 +151,13 @@ namespace BasicDataBase.FileIO
             return result;
         }
 
-        // Edit a record by index: append the new record and delete the old one (compaction by shifting)
+        // edit a record by index: append the new record and delete the old one (compaction by shifting)
         public static void EditRecord(string metadataPath, string dataPath, long recordIndex, object?[] newRecord)
         {
-            // Append new record
+            // append new record
             AppendRecord(metadataPath, dataPath, newRecord);
 
-            // Delete old record bytes by locating offsets
+            // delete old record bytes by locating offsets
             var (schema, fieldCount) = LoadSchemaAndFieldCount(metadataPath);
             if (TryGetRecordOffsets(dataPath, fieldCount, (int)recordIndex, out var s, out var e))
             {
@@ -167,7 +167,7 @@ namespace BasicDataBase.FileIO
             }
         }
 
-        // Delete a record by index (compacts file)
+        // delete a record by index (compacts file)
         public static void DeleteRecordByIndex(string metadataPath, string dataPath, long recordIndex)
         {
             var (schema, fieldCount) = LoadSchemaAndFieldCount(metadataPath);

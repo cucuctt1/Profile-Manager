@@ -1,9 +1,12 @@
 using System;
-
-namespace ProfileManager.Profiles
+// sửa tên bro
+namespace ProfileManager.Profiles // r
 {
     public sealed class ProfileRecord
     {
+        // setup record fields
+        // id:int namsinh:datetime vaoDoan:bool vaoDang:bool , all string
+        // [get set]
         public int Id { get; set; }
         public string? HoVaTen { get; set; }
         public DateTime NamSinh { get; set; }

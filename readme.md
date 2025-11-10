@@ -68,12 +68,51 @@ public void Delete(int index)
 
 ## Sơ đồ hoạt động
 ```mermaid
-flowchart LR
-	UI[WinForms UI\n(MainForm, ProfileEditorForm)] --> Repo[ProfileRepository]
-	Repo --> TableMgr[TableManager\n(base/Table)]
-	TableMgr --> FileIO[FileIOManager\n(base/FileIO)]
-	FileIO --> DataDir[(profile_data/*.bin)]
-	Repo <-->|BindingSource| UI
+flowchart TD
+	subgraph UI_Layer [UI Layer]
+		Toolbar[Toolbar & Search Box]
+		Grid[DataGridView Binding]
+		Editor[ProfileEditorForm Dialog]
+	end
+
+	subgraph App_Layer [Application Layer]
+		Controller[MainForm Controller Logic]
+		Repository[ProfileRepository]
+	end
+
+	subgraph Data_Layer [Data Access Layer]
+		TableMgr[TableManager]
+		TableDef[TableDefinition]
+		IndexMgr[IndexManager + BinarySearchTree]
+	end
+
+	subgraph Storage_Layer [Storage Layer]
+		FileIO[FileIOManager]
+		Schema[SchemaConstruct & SchemaInstruction]
+		Meta[(profile_data/__catalog/metadata.meta)]
+		DataFiles[(profile_data/Profiles/blobs & data.bin)]
+	end
+
+	Toolbar -->|User events| Controller
+	Grid -->|Row selection & commands| Controller
+	Editor -->|Form submit| Controller
+	Controller -->|Invoke repository API| Repository
+	Repository -->|Normalize fields\nShape objects| TableMgr
+	TableMgr -->|Resolve schema| TableDef
+	TableMgr -->|CRUD & query ops| IndexMgr
+	TableMgr -->|Binary buffer IO| FileIO
+	IndexMgr -->|Ensure index\n(SearchExact, SearchPrefix)| TableMgr
+	FileIO -->|Load instructions| Schema
+	Schema -->|Persist metadata| Meta
+	Meta -->|Reload on startup| Schema
+	FileIO -->|Write buffers| DataFiles
+	DataFiles -->|Stream records| FileIO
+	Schema -->|Offsets & lengths| TableMgr
+	TableMgr -->|Row handles| Repository
+	Repository -->|Project ProfileRow list| Controller
+	Controller -->|BindingSource refresh| Grid
+	Controller -->|Open dialog| Editor
+	Editor -->|Validation rules| Repository
 ```
 
 ## Chi tiết cấu trúc dữ liệu chỉ mục (B-Tree đơn giản)
