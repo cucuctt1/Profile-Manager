@@ -63,10 +63,12 @@ namespace ProfileManager.Profiles
             var query = value.Trim(); // trim khoang trang
             if (string.IsNullOrWhiteSpace(query)) return GetAll();
             var field = NormalizeField(fieldName);
+
             if (!exact)
             {
                 return SearchPartial(field, query);
             }
+            
             if (field.Equals("namsinh", StringComparison.OrdinalIgnoreCase))
             {
                 if (!DateTime.TryParse(query, CultureInfo.CurrentCulture, DateTimeStyles.AssumeLocal, out var parsed))
@@ -98,6 +100,37 @@ namespace ProfileManager.Profiles
                 list.Add(new ProfileRow(idx, ToRecord(record)));
             }
             return list;
+        }
+
+        public IReadOnlyList<ProfileRow> SearchRange(string fieldName, string? minKey, string? maxKey)
+        {
+            var field = NormalizeField(fieldName);
+            EnsureIndex(field);
+            var indexes = tableManager.SearchRange(tableName, field, minKey, maxKey);
+            return ProjectRows(indexes);
+        }
+
+        public IReadOnlyList<ProfileRow> SearchRangeParallel(string fieldName, string? minKey, string? maxKey, int? degree = null)
+        {
+            var field = NormalizeField(fieldName);
+            EnsureIndex(field);
+            var indexes = tableManager.SearchRangeParallel(tableName, field, minKey, maxKey, degree);
+            return ProjectRows(indexes);
+        }
+
+        // Fast paths that return only record indexes (no hydration); useful for benchmarks
+        public IReadOnlyList<int> SearchRangeIds(string fieldName, string? minKey, string? maxKey)
+        {
+            var field = NormalizeField(fieldName);
+            EnsureIndex(field);
+            return tableManager.SearchRange(tableName, field, minKey, maxKey);
+        }
+
+        public IReadOnlyList<int> SearchRangeParallelIds(string fieldName, string? minKey, string? maxKey, int? degree = null)
+        {
+            var field = NormalizeField(fieldName);
+            EnsureIndex(field);
+            return tableManager.SearchRangeParallel(tableName, field, minKey, maxKey, degree);
         }
 
 
@@ -166,6 +199,17 @@ namespace ProfileManager.Profiles
 
             var values = ToValues(record);
             tableManager.InsertRecord(tableName, values);
+        }
+
+        public void AddRange(IEnumerable<ProfileRecord> records)
+        {
+            if (records == null) return;
+            var list = new List<object[]>();
+            foreach (var r in records)
+            {
+                list.Add(ToValues(r));
+            }
+            tableManager.InsertRecords(tableName, list);
         }
         public void Update(int index, ProfileRecord record)
         {
@@ -301,6 +345,18 @@ namespace ProfileManager.Profiles
                 "VaoDang" or "vaodang" => "vaodang",
                 _ => "hovaten"
             };
+        }
+
+        private IReadOnlyList<ProfileRow> ProjectRows(IEnumerable<int> indexes)
+        {
+            var list = new List<ProfileRow>();
+            foreach (var idx in indexes)
+            {
+                var record = tableManager.GetRecord(tableName, idx);
+                if (record == null) continue;
+                list.Add(new ProfileRow(idx, ToRecord(record)));
+            }
+            return list;
         }
     }
 

@@ -48,7 +48,29 @@ namespace BasicDataBase.FileIO
             }
         }
 
-        // read the byte offsets (start inclusive, end exclusive) of a record by index
+        // append multiple records in a single stream (faster than per-record open/close)
+        public static void AppendRecords(string metadataPath, string dataPath, IEnumerable<object?[]> records)
+        {
+            var (schema, fieldCount) = LoadSchemaAndFieldCount(metadataPath);
+            using (var fs = File.Open(dataPath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read))
+            using (var writer = new BinaryWriter(fs))
+            {
+                fs.Seek(0, SeekOrigin.End);
+                foreach (var record in records)
+                {
+                    for (int i = 0; i < record.Length; i++)
+                    {
+                        var bytes = DataTypeConverter.ObjectToBytes(record[i]);
+                        writer.Write(bytes.Length);
+                        if (bytes.Length > 0)
+                            writer.Write(bytes);
+                    }
+                }
+                writer.Flush();
+            }
+        }
+
+            // read the byte offsets (start inclusive, end exclusive) of a record by index
         // returns true if found; out start/end are file offsets
         public static bool TryGetRecordOffsets(string dataPath, int fieldCount, long recordIndex, out long startOffset, out long endOffset)
         {

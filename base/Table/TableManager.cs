@@ -118,10 +118,20 @@ namespace BasicDataBase.Table
         {
             EnsureUserTable(tableName);
             if (records == null) throw new ArgumentNullException(nameof(records));
+            var table = GetOrLoadTable(tableName);
+
+            var materializedList = new List<object?[]>();
             foreach (var record in records)
             {
-                InsertRecord(tableName, record);
+                ValidateRecord(table.Schema, record);
+                var materialized = table.MaterializeRecord(record);
+                materializedList.Add(materialized.Values);
             }
+
+            FileIOManager.AppendRecords(table.MetadataPath, table.DataPath, materializedList);
+            table.RowCount += materializedList.Count;
+            table.MarkIndexesDirty();
+            TouchCatalog(tableName);
         }
 
         public object?[]? GetRecord(string tableName, int index)
@@ -229,6 +239,14 @@ namespace BasicDataBase.Table
             var table = GetOrLoadTable(tableName);
             table.EnsureIndex(fieldName);
             return table.IndexManager.SearchRange(fieldName, minKey, maxKey);
+        }
+
+        public List<int> SearchRangeParallel(string tableName, string fieldName, string? minKey, string? maxKey, int? degree = null)
+        {
+            EnsureUserTable(tableName);
+            var table = GetOrLoadTable(tableName);
+            table.EnsureIndex(fieldName);
+            return table.IndexManager.SearchRangeParallel(fieldName, minKey, maxKey, degree);
         }
         
         public List<int> SearchGreaterThan(string tableName, string fieldName, string key, bool inclusive = false)
