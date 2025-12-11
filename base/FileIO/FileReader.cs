@@ -1,4 +1,5 @@
 // reader
+// no longer in use
 
 using System;
 using System.Collections;
@@ -12,6 +13,7 @@ namespace BasicDataBase.FileIO
     public static string? schemaLine;
         public static BitArray decodedBits = new BitArray(1, false);
 
+        // no longer in use
         // check for header format
         public static void ReadHeader(string MetaDataDir)
         {
@@ -28,6 +30,7 @@ namespace BasicDataBase.FileIO
             }
         }
 
+        // no longer in use
         public static object[,] ReadAllData(string MetaDataDir, string DataDir)
         {
             List<object[]> rows = new List<object[]>();

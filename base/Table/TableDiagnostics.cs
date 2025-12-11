@@ -1,3 +1,4 @@
+// no longer in use
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -32,6 +33,7 @@ namespace BasicDataBase.Table
 
     public static class TableDiagnostics
     {
+        // no longer in use
         public static TableDiagnosticsResult Analyze(TableManager manager)
         {
             var result = new TableDiagnosticsResult();
@@ -65,6 +67,7 @@ namespace BasicDataBase.Table
             return result;
         }
 
+        // no longer in use
         public static void Print(TableDiagnosticsResult result)
         {
             Console.WriteLine("=== Table Diagnostics Report ===");
@@ -122,6 +125,7 @@ namespace BasicDataBase.Table
             }
         }
 
+        // no longer in use
         private static void AnalyzeTable(TableManager manager, TableInfo info, TableDiagnosticsTableResult status)
         {
             // Verify metadata

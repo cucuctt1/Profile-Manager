@@ -16,7 +16,7 @@ namespace ProfileManager.Benchmarks
             Console.WriteLine($"Data directory: {baseDir}");
 
             // Allow env overrides to avoid huge runs by default
-            int[] defaultSizes = { 1_000, 10_000, 100_000 };
+            int[] defaultSizes = {  1_000_000 };
             var sizes = ParseSizes(Environment.GetEnvironmentVariable("BENCH_SIZES")) ?? defaultSizes;
             bool includeMillion = string.Equals(Environment.GetEnvironmentVariable("BENCH_INCLUDE_MILLION"), "1", StringComparison.OrdinalIgnoreCase);
             if (includeMillion)

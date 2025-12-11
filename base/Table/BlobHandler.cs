@@ -1,3 +1,4 @@
+// no longer in use
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,11 +19,13 @@ namespace BasicDataBase.Table
             _tableManager = tableManager ?? throw new ArgumentNullException(nameof(tableManager));
         }
 
+        // no longer in use
         public string AddBlob(string tableName, int recordIndex, string fieldName, byte[] data)
         {
             return ReplaceBlob(tableName, recordIndex, fieldName, data);
         }
 
+        // no longer in use
         public string AddBlobFromFile(string tableName, int recordIndex, string fieldName, string filePath)
         {
             if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentException("File path required", nameof(filePath));
@@ -31,6 +34,7 @@ namespace BasicDataBase.Table
             return ReplaceBlob(tableName, recordIndex, fieldName, bytes);
         }
 
+        // no longer in use
         public string ReplaceBlob(string tableName, int recordIndex, string fieldName, byte[] data)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
@@ -50,6 +54,7 @@ namespace BasicDataBase.Table
             return string.Empty;
         }
 
+        // no longer in use
         public void DeleteBlob(string tableName, int recordIndex, string fieldName)
         {
             var tableInfo = _tableManager.GetTableInfo(tableName);
@@ -62,16 +67,19 @@ namespace BasicDataBase.Table
             _tableManager.UpdateRecord(tableName, recordIndex, newRecord);
         }
 
+        // no longer in use
         public byte[]? ReadBlob(string tableName, int recordIndex, string fieldName)
         {
             return _tableManager.ReadBlob(tableName, recordIndex, fieldName);
         }
 
+        // no longer in use
         public string? GetBlobPath(string tableName, int recordIndex, string fieldName)
         {
             return _tableManager.GetBlobPath(tableName, recordIndex, fieldName);
         }
 
+        // no longer in use
         public IReadOnlyList<BlobReference> ListBlobs(string tableName, string fieldName)
         {
             var tableInfo = _tableManager.GetTableInfo(tableName);
@@ -89,6 +97,7 @@ namespace BasicDataBase.Table
             return list;
         }
 
+        // no longer in use
         public IReadOnlyList<OrphanBlob> ListOrphanBlobs(string tableName)
         {
             var info = _tableManager.GetTableInfo(tableName);
@@ -118,6 +127,7 @@ namespace BasicDataBase.Table
             return orphans;
         }
 
+        // no longer in use
         private static object[] CloneRecord(object?[] record)
         {
             var clone = new object[record.Length];
@@ -125,6 +135,7 @@ namespace BasicDataBase.Table
             return clone;
         }
 
+        // no longer in use
         private static int ResolveBlobFieldIndex(TableInfo tableInfo, string fieldName)
         {
             for (int i = 0; i < tableInfo.Schema.Fields.Count; i++)
