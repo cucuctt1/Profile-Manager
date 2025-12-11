@@ -32,15 +32,20 @@ namespace BasicDataBase.Index
             if (fieldPos < 0) throw new ArgumentException($"Field '{fieldName}' not found in schema");
 
             var all = FileIOManager.ReadAll(metadataPath, dataPath);
-            var tree = new BinarySearchTree();
-            for (int r = 0; r < all.GetLength(0); r++)
+            int rowCount = all.GetLength(0);
+            var flat = new List<KeyValuePair<string, int>>(rowCount);
+            for (int r = 0; r < rowCount; r++)
             {
                 var key = all[r, fieldPos]?.ToString() ?? string.Empty;
-                tree.Insert(key, r);
+                flat.Add(new KeyValuePair<string, int>(key, r));
             }
 
+            flat.Sort((a, b) => string.Compare(a.Key, b.Key, StringComparison.Ordinal));
+
+            var tree = new BinarySearchTree();
+            tree.RebuildBalancedFrom(flat);
             indexes[fieldName] = tree;
-            return all.GetLength(0);
+            return rowCount;
         }
 
         // Exact search on a previously built index. Returns record indexes.
@@ -62,6 +67,13 @@ namespace BasicDataBase.Index
         {
             if (!indexes.TryGetValue(fieldName, out var tree)) throw new InvalidOperationException($"Index for '{fieldName}' not built");
             return tree.SearchRange(minKey, maxKey);
+        }
+
+        // Parallel range scan, giữ thứ tự đã sắp xếp
+        public List<int> SearchRangeParallel(string fieldName, string? minKey, string? maxKey, int? degree = null)
+        {
+            if (!indexes.TryGetValue(fieldName, out var tree)) throw new InvalidOperationException($"Index for '{fieldName}' not built");
+            return tree.SearchRangeParallel(minKey, maxKey, degree);
         }
 
         // Greater than search. If inclusive is true, includes records equal to key.
