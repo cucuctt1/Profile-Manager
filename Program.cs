@@ -15,7 +15,16 @@ namespace ProfileManager
 		{
 			var args = Environment.GetCommandLineArgs();
 			bool benchMode = args.Any(a => string.Equals(a, "--bench", StringComparison.OrdinalIgnoreCase) || string.Equals(a, "-bench", StringComparison.OrdinalIgnoreCase) || string.Equals(a, "bench", StringComparison.OrdinalIgnoreCase));
-			if (benchMode)
+			bool benchMode2 = args.Any(a => string.Equals(a, "--bench2", StringComparison.OrdinalIgnoreCase) || string.Equals(a, "-bench2", StringComparison.OrdinalIgnoreCase) || string.Equals(a, "bench2", StringComparison.OrdinalIgnoreCase));
+
+			if (benchMode2)
+			{
+				ConsoleHelper.EnsureConsole();
+				var benchRoot = Path.Combine(AppContext.BaseDirectory, "bench_data_full");
+				FullAlgorithmBenchmark.Run(benchRoot);
+				return;
+			}
+			else if (benchMode)
 			{
 				ConsoleHelper.EnsureConsole();
 				var benchRoot = Path.Combine(AppContext.BaseDirectory, "bench_data");
